@@ -5,9 +5,11 @@ import sqlite3
 import random
 from panel import Ui_quiz
 
+# Questions Database
 conn = sqlite3.connect('questions.db')
 c = conn.cursor()
 
+# User information Database
 conn2 = sqlite3.connect('info_user.db')
 c2 = conn2.cursor()
 c2.execute('''CREATE TABLE IF NOT EXISTS level(
@@ -15,11 +17,23 @@ c2.execute('''CREATE TABLE IF NOT EXISTS level(
             )''')
 conn2.commit()
 
+# default time question
 time = 8
+
+# answer question variable
 answer_question = 0
+
 check_answer = True
+
+# Page status variable (question page/other page)
 status_question = False
+
+# level variable
 level = 0
+
+# check buy time and wrong option
+status_buy_time = True
+status_buy_option = True
 
 
 class Root(QMainWindow):
@@ -30,38 +44,49 @@ class Root(QMainWindow):
         QMainWindow.__init__(self)
         self.ui = Ui_quiz()
         self.ui.setupUi(self)
+        self.oldPos = []
         self.show()
 
+        # set timer
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.timer_func)
         self.timer.start(1000)
 
+        # set info user
         self.ui.username.setText(os.getlogin())
         self.ui.profile.setText(str(os.getlogin())[0].lower())
-        # self.ui.username2.setText(os.getlogin())
+        self.ui.username2.setText(os.getlogin())
+
+        # Set level
         try:
             c2.execute('SELECT * FROM level')
             level = c2.fetchone()[0]
             self.ui.level.setText(level)
+            self.ui.level2.setText(level)
         except:
             c2.execute('INSERT INTO level VALUES(1)')
             conn2.commit()
 
-        self.ui.letsgo.clicked.connect(lambda: self.ui.pages.setCurrentWidget(self.ui.select))\
-
+        # Set Button
+        self.ui.letsgo.clicked.connect(lambda: self.ui.pages.setCurrentWidget(self.ui.select))
         self.ui.tech.clicked.connect(self.tech)
-
         self.ui.sport.clicked.connect(self.sport)
 
+        # set option
         self.ui.one.clicked.connect(self.one)
         self.ui.two.clicked.connect(self.two)
         self.ui.three.clicked.connect(self.three)
         self.ui.four.clicked.connect(self.four)
 
+        # set Button end question
         self.ui.end.clicked.connect(lambda: self.ui.pages.setCurrentWidget(self.ui.select))
-        self.ui.end.clicked.connect(self.end_quest)
+        self.ui.end.clicked.connect(self.end_question)
         self.ui.end2.clicked.connect(lambda: self.ui.pages.setCurrentWidget(self.ui.select))
-        self.ui.end2.clicked.connect(self.end_quest)
+        self.ui.end2.clicked.connect(self.end_question)
+
+        # help user
+        self.ui.buy_option.clicked.connect(self.wrong_option)
+        self.ui.buy_time.clicked.connect(self.buy_time)
 
     def mousePressEvent(self, evt):
         self.oldPos = evt.globalPos()
@@ -72,6 +97,7 @@ class Root(QMainWindow):
         self.move(self.x() + delta.x(), self.y() + delta.y())
         self.oldPos = evt.globalPos()
 
+    # Technology category
     def tech(self):
         global conn
         global c
@@ -94,6 +120,7 @@ class Root(QMainWindow):
         status_question = True
         time = 8
 
+    # Sports category
     def sport(self):
         global conn
         global c
@@ -116,9 +143,21 @@ class Root(QMainWindow):
         status_question = True
         time = 8
 
+    # Set option questions
     def set_qu(self, question, one, two, three, four, answer):
         global answer_question
         global check_answer
+        global status_buy_option
+        global status_buy_time
+
+        status_buy_time = True
+        status_buy_option = True
+
+        self.ui.line1.hide()
+        self.ui.line2.hide()
+        self.ui.line3.hide()
+        self.ui.line4.hide()
+
         self.ui.quest.setText(question)
         self.ui.quest_win.setText(question)
         self.ui.quest_lost.setText(question)
@@ -140,6 +179,7 @@ class Root(QMainWindow):
             self.ui.answer_win.setText(four)
             self.ui.answer_lost.setText(four)
 
+    # One second timer
     def timer_func(self):
         global time
         global status_question
@@ -148,6 +188,7 @@ class Root(QMainWindow):
         c2.execute('SELECT * FROM level')
         level = c2.fetchone()[0]
         self.ui.level.setText(level)
+        self.ui.level2.setText(level)
 
         if status_question:
             # timer
@@ -160,6 +201,7 @@ class Root(QMainWindow):
                 self.ui.pages.setCurrentWidget(self.ui.False_answer)
                 status_question = False
 
+    # Option one to four
     def one(self):
         self.check(1)
 
@@ -172,6 +214,7 @@ class Root(QMainWindow):
     def four(self):
         self.check(4)
 
+    # Check user answer
     def check(self, user_answer):
         global check_answer
         global answer_question
@@ -180,14 +223,52 @@ class Root(QMainWindow):
         if user_answer == answer_question:
             check_answer = False
             self.ui.pages.setCurrentWidget(self.ui.True_answer)
-            new_level = int(level) + 1
+            new_level = float(level) + 1
             sql_update_query = f"""Update level set level = {new_level} where level = {level}"""
             c2.execute(sql_update_query)
             conn2.commit()
         else:
             self.ui.pages.setCurrentWidget(self.ui.False_answer)
 
-    def end_quest(self):
+    # help user (show wrong option)
+    def wrong_option(self):
+        global answer_question
+        global level
+        global status_buy_option
+
+        if status_buy_option:
+            status_buy_option = False
+            if answer_question != 1:
+                self.ui.line1.show()
+            elif answer_question != 2:
+                self.ui.line2.show()
+            elif answer_question != 3:
+                self.ui.line3.show()
+            elif answer_question != 4:
+                self.ui.line4.show()
+            new_level = float(level) - 0.5
+            sql_update_query = f"""Update level set level = {new_level} where level = {level}"""
+            c2.execute(sql_update_query)
+            conn2.commit()
+
+    # buy time
+    @staticmethod
+    def buy_time():
+        global time
+        global level
+        global status_buy_time
+
+        if status_buy_time:
+            time += 5
+            status_buy_time = False
+            new_level = float(level) - 0.5
+            sql_update_query = f"""Update level set level = {new_level} where level = {level}"""
+            c2.execute(sql_update_query)
+            conn2.commit()
+
+    # end question
+    @staticmethod
+    def end_question():
         global status_question
         status_question = False
 
