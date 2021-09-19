@@ -71,6 +71,7 @@ class Root(QMainWindow):
         self.ui.letsgo.clicked.connect(lambda: self.ui.pages.setCurrentWidget(self.ui.select))
         self.ui.tech.clicked.connect(self.tech)
         self.ui.sport.clicked.connect(self.sport)
+        self.ui.info.clicked.connect(self.info)
 
         # set option
         self.ui.one.clicked.connect(self.one)
@@ -143,12 +144,38 @@ class Root(QMainWindow):
         status_question = True
         time = 8
 
+    def info(self):
+        global conn
+        global c
+        global time
+        global check_answer
+        global status_question
+
+        self.ui.next.clicked.connect(self.info)
+        self.ui.next2.clicked.connect(self.info)
+        self.ui.pages.setCurrentWidget(self.ui.question)
+
+        c.execute('SELECT * FROM information')
+        questions = c.fetchall()
+        tedad = len(questions)
+        ran = random.randrange(0, tedad)
+        questions = questions[ran]
+        self.set_qu(questions[0], questions[1], questions[2], questions[3], questions[4], questions[5])
+
+        check_answer = True
+        status_question = True
+        time = 8
+
     # Set option questions
     def set_qu(self, question, one, two, three, four, answer):
         global answer_question
         global check_answer
         global status_buy_option
         global status_buy_time
+
+        # clear Ui
+        self.ui.quest.clear()
+        self.ui.quest_2.clear()
 
         status_buy_time = True
         status_buy_option = True
@@ -158,7 +185,13 @@ class Root(QMainWindow):
         self.ui.line3.hide()
         self.ui.line4.hide()
 
-        self.ui.quest.setText(question)
+        if len(question) <= 45:
+            self.ui.quest.setText(question)
+            self.ui.quest_2.clear()
+        else:
+            self.ui.quest.setText(question[:40])
+            self.ui.quest_2.setText(question[40:])
+
         self.ui.quest_win.setText(question)
         self.ui.quest_lost.setText(question)
         self.ui.one.setText(one)
@@ -185,11 +218,6 @@ class Root(QMainWindow):
         global status_question
         global level
 
-        c2.execute('SELECT * FROM level')
-        level = c2.fetchone()[0]
-        self.ui.level.setText(level)
-        self.ui.level2.setText(level)
-
         if status_question:
             # timer
             time -= 1
@@ -200,6 +228,11 @@ class Root(QMainWindow):
             if time == 0 and check_answer:
                 self.ui.pages.setCurrentWidget(self.ui.False_answer)
                 status_question = False
+
+            c2.execute('SELECT * FROM level')
+            level = c2.fetchone()[0]
+            self.ui.level.setText(level)
+            self.ui.level2.setText(level)
 
     # Option one to four
     def one(self):
