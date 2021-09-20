@@ -94,7 +94,7 @@ class Ui_quiz(object):
 "    color: rgb(31, 12, 47);\n"
 "}\n"
 "QPushButton:hover {\n"
-"    background-color: rgb(31, 12, 47);\n"
+"    background-color: rgb(95, 0, 143);\n"
 "    color: rgb(181, 83, 255);\n"
 "}")
         self.tech.setObjectName("tech")
@@ -113,7 +113,7 @@ class Ui_quiz(object):
 "    color: rgb(31, 12, 47);\n"
 "}\n"
 "QPushButton:hover {\n"
-"    background-color: rgb(31, 12, 47);\n"
+"    background-color: rgb(95, 0, 143);\n"
 "    color: rgb(181, 83, 255);\n"
 "}")
         self.sport.setObjectName("sport")
@@ -132,7 +132,7 @@ class Ui_quiz(object):
 "    color: rgb(31, 12, 47);\n"
 "}\n"
 "QPushButton:hover {\n"
-"    background-color: rgb(31, 12, 47);\n"
+"    background-color: rgb(95, 0, 143);\n"
 "    color: rgb(181, 83, 255);\n"
 "}")
         self.info.setObjectName("info")
@@ -151,7 +151,7 @@ class Ui_quiz(object):
 "    color: rgb(31, 12, 47);\n"
 "}\n"
 "QPushButton:hover {\n"
-"    background-color: rgb(31, 12, 47);\n"
+"    background-color: rgb(95, 0, 143);\n"
 "    color: rgb(181, 83, 255);\n"
 "}")
         self.cinema.setObjectName("cinema")
@@ -170,7 +170,7 @@ class Ui_quiz(object):
 "    color: rgb(31, 12, 47);\n"
 "}\n"
 "QPushButton:hover {\n"
-"    background-color: rgb(31, 12, 47);\n"
+"    background-color: rgb(95, 0, 143);\n"
 "    color: rgb(181, 83, 255);\n"
 "}")
         self.math.setObjectName("math")
@@ -189,7 +189,7 @@ class Ui_quiz(object):
 "    color: rgb(31, 12, 47);\n"
 "}\n"
 "QPushButton:hover {\n"
-"    background-color: rgb(31, 12, 47);\n"
+"    background-color: rgb(95, 0, 143);\n"
 "    color: rgb(181, 83, 255);\n"
 "}")
         self.nature.setObjectName("nature")
